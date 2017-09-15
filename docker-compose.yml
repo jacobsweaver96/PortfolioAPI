@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  portfolioapi:
+    image: portfolioapi
+    build:
+      context: ./PortfolioAPI
+      dockerfile: Dockerfile
