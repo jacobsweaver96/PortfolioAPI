@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortfolioAPI", "PortfolioAPI\PortfolioAPI.csproj", "{CE2913D9-389C-47C9-8FC0-4324F556369A}"
-EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{3C5F17A1-8193-46BA-ADFD-A3302CC1F1BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortfolioAPI", "PortfolioAPI\PortfolioAPI.csproj", "{DCF3E7B8-E1A3-4D6D-B09C-E8543DA2DEC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortfolioAPI.Tests", "PortfolioAPI.Tests\PortfolioAPI.Tests.csproj", "{4C534DE0-8D62-47B1-8AD7-A6690EEE72CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortfolioModels", "..\PortfolioModels\PortfolioModels\PortfolioModels.csproj", "{648B4917-4956-474F-955A-803B1DC3EE6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiModels", "..\ApiModels\ApiModels\ApiModels.csproj", "{4CACDD95-8EC7-4891-B2A8-AD0CEBE161BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +19,26 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CE2913D9-389C-47C9-8FC0-4324F556369A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE2913D9-389C-47C9-8FC0-4324F556369A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE2913D9-389C-47C9-8FC0-4324F556369A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE2913D9-389C-47C9-8FC0-4324F556369A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3C5F17A1-8193-46BA-ADFD-A3302CC1F1BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3C5F17A1-8193-46BA-ADFD-A3302CC1F1BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C5F17A1-8193-46BA-ADFD-A3302CC1F1BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C5F17A1-8193-46BA-ADFD-A3302CC1F1BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCF3E7B8-E1A3-4D6D-B09C-E8543DA2DEC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCF3E7B8-E1A3-4D6D-B09C-E8543DA2DEC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCF3E7B8-E1A3-4D6D-B09C-E8543DA2DEC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCF3E7B8-E1A3-4D6D-B09C-E8543DA2DEC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C534DE0-8D62-47B1-8AD7-A6690EEE72CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C534DE0-8D62-47B1-8AD7-A6690EEE72CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C534DE0-8D62-47B1-8AD7-A6690EEE72CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C534DE0-8D62-47B1-8AD7-A6690EEE72CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{648B4917-4956-474F-955A-803B1DC3EE6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{648B4917-4956-474F-955A-803B1DC3EE6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{648B4917-4956-474F-955A-803B1DC3EE6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{648B4917-4956-474F-955A-803B1DC3EE6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CACDD95-8EC7-4891-B2A8-AD0CEBE161BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CACDD95-8EC7-4891-B2A8-AD0CEBE161BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CACDD95-8EC7-4891-B2A8-AD0CEBE161BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CACDD95-8EC7-4891-B2A8-AD0CEBE161BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="PortfolioDB" Class="PortfolioDBDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=jsw01.database.windows.net;Initial Catalog=PortfolioDB;User ID=jweaver;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="PortfolioDBConnectionString1" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Users" Member="Users">
+    <Type Name="User">
+      <Column Name="UserId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Email" Type="System.String" DbType="NVarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="Password" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="Salt" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="IsDeleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="User_GithubUser" Member="GithubUsers" ThisKey="UserId" OtherKey="UserId" Type="GithubUser" />
+      <Association Name="User_UserRole_Map" Member="UserRole_Maps" ThisKey="UserId" OtherKey="UserId" Type="UserRole_Map" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ApiPermissions" Member="ApiPermissions">
+    <Type Name="ApiPermission">
+      <Column Name="PermissionName" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="CanRead" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="CanWrite" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="CanAlterPermissions" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="ApiPermissionsId" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Association Name="ApiPermission_Client" Member="Clients" ThisKey="ApiPermissionsId" OtherKey="PermissionsId" Type="Client" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Clients" Member="Clients">
+    <Type Name="Client">
+      <Column Name="ClientName" Type="System.String" DbType="NVarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="IsDeleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ClientKey" Type="System.String" DbType="NVarChar(32)" CanBeNull="true" />
+      <Column Name="ClientId" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="PermissionsId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="ApiPermission_Client" Member="ApiPermission" ThisKey="PermissionsId" OtherKey="ApiPermissionsId" Type="ApiPermission" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.GithubUsers" Member="GithubUsers">
+    <Type Name="GithubUser">
+      <Column Name="GithubUserId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="UserId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Username" Type="System.String" DbType="NVarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="IsDeleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="User_GithubUser" Member="User" ThisKey="UserId" OtherKey="UserId" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Roles" Member="Roles">
+    <Type Name="Role">
+      <Column Name="RoleId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="IsDeleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="Role_UserRole_Map" Member="UserRole_Maps" ThisKey="RoleId" OtherKey="RoleId" Type="UserRole_Map" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UserRole_Map" Member="UserRole_Maps">
+    <Type Name="UserRole_Map">
+      <Column Name="UserRoleMapId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="RoleId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UserId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="IsDeleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="Role_UserRole_Map" Member="Role" ThisKey="RoleId" OtherKey="RoleId" Type="Role" IsForeignKey="true" />
+      <Association Name="User_UserRole_Map" Member="User" ThisKey="UserId" OtherKey="UserId" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+</Database>
