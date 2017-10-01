@@ -47,7 +47,7 @@ namespace PortfolioAPI.Controllers
         }
 
         [HttpGet]
-        [Route("{roleId:int")]
+        [Route("{roleId:int}")]
         [RestInfo("GET", "Get the role with {roleId}")]
         [RequiresReadAccess]
         public ApiResponse Get(int roleId)
@@ -89,7 +89,7 @@ namespace PortfolioAPI.Controllers
         }
 
         [HttpDelete]
-        [Route("{roleId:int")]
+        [Route("{roleId:int}")]
         [RestInfo("DELETE", "Delete the role with {roleId}")]
         [RequiresWriteAccess]
         public ApiResponse Delete(int roleId)

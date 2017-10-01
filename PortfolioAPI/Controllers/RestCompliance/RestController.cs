@@ -144,7 +144,20 @@ namespace PortfolioAPI.Controllers
 
             try
             {
-                if (AuthorizationService.Authorize(ActionContext.Request.Headers.Authorization?.Parameter, requiredPermissions))
+                var authHeader = ActionContext.Request.Headers.Authorization?.Parameter;
+
+                // Only allow https
+                if (ActionContext.Request.RequestUri.Scheme != Uri.UriSchemeHttps)
+                {
+                    response.ResponseCode = HttpStatusCode.Forbidden;
+
+                    if (ActionContext.Request.RequestUri.Scheme == Uri.UriSchemeHttp &&
+                        !String.IsNullOrWhiteSpace(authHeader) && authHeader.Length == 32)
+                    {
+                        Log.Warn($"Client key beginning with {authHeader.Substring(0, 10)}... was receieved over an insecure connection");
+                    }
+                }
+                else if (AuthorizationService.Authorize(authHeader, requiredPermissions))
                 {
                     ret = dataExec();
                     switch (ret.Status)

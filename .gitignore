@@ -36,6 +36,10 @@ bld/
 #Credential files
 *.crd.xml
 
+#logs
+PortfolioApiLogs
+PortfolioApiLogs/*
+
 # NUNIT
 *.VisualState.xml
 TestResult.xml

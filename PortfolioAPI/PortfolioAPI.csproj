@@ -217,6 +217,7 @@
       <LastGenOutput>PortfolioDB.designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="log4net.config" />
     <None Include="Models\PortfolioDB.dbml.layout">
       <DependentUpon>PortfolioDB.dbml</DependentUpon>
     </None>
