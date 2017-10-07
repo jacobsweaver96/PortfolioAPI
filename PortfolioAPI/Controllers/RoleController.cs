@@ -1,18 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using ApiModels.Models.Response;
-using PortfolioAPI.ControllerAttributes;
+using SandyModels.Models.ApiModels;
 using System.Web.Http;
-using PortfolioModels.Models;
+using SandyModels.Models;
 using PortfolioAPI.Util;
+using System.Reflection;
+using PortfolioAPI.Interfaces;
+using RestEasy.Controllers;
+using SandyUtils.Utils;
+using RestEasy.Attributes;
 
 namespace PortfolioAPI.Controllers
 {
     [RoutePrefix("api/Roles")]
     public sealed class RoleController : RestController
     {
+        private IDataAccessService DataAccessService
+        {
+            get
+            {
+                return DependencyResolver.Resolve<IDataAccessService>();
+            }
+        }
+
         protected override List<RestController> RelatedEndpoints
         {
             get
@@ -38,7 +48,8 @@ namespace PortfolioAPI.Controllers
         [RequiresReadAccess]
         public ApiResponse Get()
         {
-            var response = CreateRestResponse(() =>
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            () =>
             {
                 return DataAccessService.UserDataAccessor.GetRoles();
             }, (List<Models.Role> o) => { return o.Select(v => ModelConverter.ToSeriazlizableRole(v)).ToList(); });
@@ -52,7 +63,8 @@ namespace PortfolioAPI.Controllers
         [RequiresReadAccess]
         public ApiResponse Get(int roleId)
         {
-            var response = CreateRestResponse(() =>
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            () =>
             {
                 return DataAccessService.UserDataAccessor.GetRole(roleId);
             }, (Models.Role o) => { return ModelConverter.ToSeriazlizableRole(o); });
@@ -66,7 +78,8 @@ namespace PortfolioAPI.Controllers
         [RequiresWriteAccess]
         public ApiResponse Post(int roleId, [FromBody]Role value)
         {
-            var response = CreateRestResponse(() =>
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            () =>
             {
                 return DataAccessService.UserDataAccessor.UpdateRole(roleId, ModelConverter.ToDbRole(value));
             });
@@ -80,7 +93,8 @@ namespace PortfolioAPI.Controllers
         [RequiresWriteAccess]
         public ApiResponse Put([FromBody]Role value)
         {
-            var response = CreateRestResponse(() =>
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            () =>
             {
                 return DataAccessService.UserDataAccessor.AddRole(ModelConverter.ToDbRole(value));
             });
@@ -94,7 +108,8 @@ namespace PortfolioAPI.Controllers
         [RequiresWriteAccess]
         public ApiResponse Delete(int roleId)
         {
-            var response = CreateRestResponse(() =>
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            () =>
             {
                 return DataAccessService.UserDataAccessor.DeleteRole(roleId);
             });

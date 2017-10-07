@@ -45,6 +45,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <FilesToIncludeForPublish>AllFilesInTheProject</FilesToIncludeForPublish>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -62,6 +63,15 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestEasy, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestEasy.1.0.0\lib\RestEasy.dll</HintPath>
+    </Reference>
+    <Reference Include="SandyModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SandyModels.1.0.2\lib\SandyModels.dll</HintPath>
+    </Reference>
+    <Reference Include="SandyUtils, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SandyUtils.1.0.1\lib\SandyUtils.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -166,25 +176,18 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="ControllerAttributes\AccessAttributes.cs" />
-    <Compile Include="ControllerAttributes\RestInfoAttribute.cs" />
     <Compile Include="Controllers\GithubUsersController.cs" />
     <Compile Include="Controllers\RoleController.cs" />
-    <Compile Include="DataServices\DataAccessors\Class\DataResponse.cs" />
     <Compile Include="DataServices\DataAccessors\ClientDataAccessor.cs" />
     <Compile Include="DataServices\DataAccessors\UserDataAccessor.cs" />
     <Compile Include="DataServices\DataServiceInterfaces\DataAccessors\IClientDataAccessor.cs" />
     <Compile Include="DataServices\DataServiceInterfaces\DataAccessors\IGithubUserDataAccessor.cs" />
     <Compile Include="DataServices\DataAccessors\GithubUserDataAccessor.cs" />
-    <Compile Include="DataServices\DataServiceInterfaces\IAuthorizationService.cs" />
     <Compile Include="DataServices\PortfolioAuthorizationService.cs" />
     <Compile Include="DataServices\PortfolioDataAccessService.cs" />
     <Compile Include="DataServices\DataServiceInterfaces\DataAccessors\IUserDataAccessor.cs" />
     <Compile Include="DataServices\DataServiceInterfaces\IDataAccessService.cs" />
-    <Compile Include="Controllers\RestCompliance\IRESTful.cs" />
-    <Compile Include="Controllers\RestCompliance\RestController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
-    <Compile Include="DependencyResolver.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -197,16 +200,13 @@
       <DependentUpon>PortfolioDB.dbml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util\CredentialManager.cs" />
-    <Compile Include="Util\FormatUtil.cs" />
     <Compile Include="Util\ModelConverter.cs" />
-    <Compile Include="Util\SecurityUtil.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="App_Data\Credentials.crd.xml">
+    <Content Include="App_Data\Credentials.crd.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
-    </Resource>
+    </Content>
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="ApplicationInsights.config">
@@ -233,24 +233,12 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Areas\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\ApiModels\ApiModels\ApiModels.csproj">
-      <Project>{4cacdd95-8ec7-4891-b2a8-ad0cebe161bd}</Project>
-      <Name>ApiModels</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\PortfolioModels\PortfolioModels\PortfolioModels.csproj">
-      <Project>{648b4917-4956-474f-955a-803b1dc3ee6c}</Project>
-      <Name>PortfolioModels</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

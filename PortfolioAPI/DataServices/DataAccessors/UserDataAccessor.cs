@@ -5,7 +5,8 @@ using log4net;
 using System.Data.SqlClient;
 using PortfolioAPI.DataServices.DataServiceInterfaces.DataAccessors;
 using System.Collections.Generic;
-using PortfolioAPI.DataServices.DataAccessors.Class;
+using SandyUtils.Utils;
+using SandyModels.Models;
 
 namespace PortfolioAPI.DataServices.DataAccessors
 {
@@ -35,7 +36,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <param name="UserId">The user's id</param>
         /// <param name="githubUser">The github account</param>
         /// <returns>Success determinator</returns>
-        public DataResponse AddGithubAccount(int UserId, GithubUser githubUser)
+        public DataResponse AddGithubAccount(int UserId, Models.GithubUser githubUser)
         {
             DataResponse response;
 
@@ -72,7 +73,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="user">The user to add</param>
         /// <returns>Success determinator</returns>
-        public DataResponse AddUser(User user)
+        public DataResponse AddUser(Models.User user)
         {
             DataResponse response;
 
@@ -138,9 +139,9 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="UserId">The user's id</param>
         /// <returns>The user</returns>
-        public DataResponse<User> GetUser(int UserId)
+        public DataResponse<Models.User> GetUser(int UserId)
         {
-            DataResponse<User> response;
+            DataResponse<Models.User> response;
 
             try
             {
@@ -148,22 +149,22 @@ namespace PortfolioAPI.DataServices.DataAccessors
 
                 if (user == null)
                 {
-                    response = new DataResponse<User>(DataStatusCode.INVALID, "Invalid user id");
+                    response = new DataResponse<Models.User>(DataStatusCode.INVALID, "Invalid user id");
                 }
                 else
                 {
-                    response = new DataResponse<User>(user, DataStatusCode.SUCCESS);
+                    response = new DataResponse<Models.User>(user, DataStatusCode.SUCCESS);
                 }
             }
             catch (SqlException ex)
             {
                 logger.Error("Sql exception on geting a user", ex);
-                response = new DataResponse<User>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.User>(DataStatusCode.ERROR);
             }
             catch (Exception ex)
             {
                 logger.Error("Exception on getting user", ex);
-                response = new DataResponse<User>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.User>(DataStatusCode.ERROR);
             }
 
             return response;
@@ -174,9 +175,9 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="email">The user's email address / username</param>
         /// <returns>The user</returns>
-        public DataResponse<User> GetUser(string email)
+        public DataResponse<Models.User> GetUser(string email)
         {
-            DataResponse<User> response;
+            DataResponse<Models.User> response;
 
             try
             {
@@ -184,22 +185,22 @@ namespace PortfolioAPI.DataServices.DataAccessors
 
                 if (user == null)
                 {
-                    response = new DataResponse<User>(DataStatusCode.INVALID, "Invalid user id");
+                    response = new DataResponse<Models.User>(DataStatusCode.INVALID, "Invalid user id");
                 }
                 else
                 {
-                    response = new DataResponse<User>(user, DataStatusCode.SUCCESS);
+                    response = new DataResponse<Models.User>(user, DataStatusCode.SUCCESS);
                 } 
             }
             catch (SqlException ex)
             {
                 logger.Error("Sql exception on getting a user by email", ex);
-                response = new DataResponse<User>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.User>(DataStatusCode.ERROR);
             }
             catch (Exception ex)
             {
                 logger.Error("Exception on getting user by email", ex);
-                response = new DataResponse<User>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.User>(DataStatusCode.ERROR);
             }
 
             return response;
@@ -239,12 +240,12 @@ namespace PortfolioAPI.DataServices.DataAccessors
             catch (SqlException ex)
             {
                 logger.Error("Sql exception on removing github accounts from a user", ex);
-                response = new DataResponse<User>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.User>(DataStatusCode.ERROR);
             }
             catch (Exception ex)
             {
                 logger.Error("Exception on removing github accounts from user", ex);
-                response = new DataResponse<User>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.User>(DataStatusCode.ERROR);
             }
 
             return response;
@@ -278,12 +279,12 @@ namespace PortfolioAPI.DataServices.DataAccessors
             catch (SqlException ex)
             {
                 logger.Error("Sql exception on removing a github account from a user", ex);
-                response = new DataResponse<User>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.User>(DataStatusCode.ERROR);
             }
             catch (Exception ex)
             {
                 logger.Error("Exception on removing github account from user", ex);
-                response = new DataResponse<User>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.User>(DataStatusCode.ERROR);
             }
 
             return response;
@@ -295,7 +296,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <param name="UserId">The user's id</param>
         /// <param name="user">The user</param>
         /// <returns>Success determinator</returns>
-        public DataResponse UpdateUser(int UserId, User user)
+        public DataResponse UpdateUser(int UserId, Models.User user)
         {
             DataResponse response;
 
@@ -454,7 +455,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="role">The role to be added</param>
         /// <returns>Success determinator</returns>
-        public DataResponse AddRole(Role role)
+        public DataResponse AddRole(Models.Role role)
         {
             DataResponse response;
 
@@ -520,32 +521,32 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// Gets all active roles
         /// </summary>
         /// <returns>List of roles</returns>
-        public DataResponse<List<Role>> GetRoles()
+        public DataResponse<List<Models.Role>> GetRoles()
         {
-            DataResponse<List<Role>> response;
+            DataResponse<List<Models.Role>> response;
 
             try
             {
                 var roles = DbContext.Roles.Where(v => !v.IsDeleted).ToList();
-                response = new DataResponse<List<Role>>(roles, DataStatusCode.SUCCESS);
+                response = new DataResponse<List<Models.Role>>(roles, DataStatusCode.SUCCESS);
             }
             catch (SqlException ex)
             {
                 logger.Error("There was an sql exception while getting roles", ex);
-                response = new DataResponse<List<Role>>(DataStatusCode.ERROR);
+                response = new DataResponse<List<Models.Role>>(DataStatusCode.ERROR);
             }
             catch (Exception ex)
             {
                 logger.Error("There was an exception while getting roles", ex);
-                response = new DataResponse<List<Role>>(DataStatusCode.ERROR);
+                response = new DataResponse<List<Models.Role>>(DataStatusCode.ERROR);
             }
 
             return response;
         }
 
-        public DataResponse<Role> GetRole(int roleId)
+        public DataResponse<Models.Role> GetRole(int roleId)
         {
-            DataResponse<Role> response;
+            DataResponse<Models.Role> response;
 
             try
             {
@@ -553,22 +554,22 @@ namespace PortfolioAPI.DataServices.DataAccessors
 
                 if (role == null)
                 {
-                    response = new DataResponse<Role>(DataStatusCode.INVALID, "Invalid role id");
+                    response = new DataResponse<Models.Role>(DataStatusCode.INVALID, "Invalid role id");
                 }
                 else
                 {
-                    response = new DataResponse<Role>(role, DataStatusCode.SUCCESS);
+                    response = new DataResponse<Models.Role>(role, DataStatusCode.SUCCESS);
                 }
             }
             catch (SqlException ex)
             {
                 logger.Error($"There was an sql exception while getting role with roleId: {roleId}", ex);
-                response = new DataResponse<Role>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.Role>(DataStatusCode.ERROR);
             }
             catch (Exception ex)
             {
                 logger.Error($"There was an exception while getting role with roleId: {roleId}", ex);
-                response = new DataResponse<Role>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.Role>(DataStatusCode.ERROR);
             }
 
             return response;
@@ -580,7 +581,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <param name="roleId">The role id of the role to updated</param>
         /// <param name="role">The updated role</param>
         /// <returns>Success determinator</returns>
-        public DataResponse UpdateRole(int roleId, Role role)
+        public DataResponse UpdateRole(int roleId, Models.Role role)
         {
             DataResponse response;
 

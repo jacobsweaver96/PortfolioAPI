@@ -4,7 +4,8 @@ using System.Linq;
 using PortfolioAPI.Models;
 using log4net;
 using System.Data.SqlClient;
-using PortfolioAPI.DataServices.DataAccessors.Class;
+using SandyModels.Models;
+using SandyUtils.Utils;
 
 namespace PortfolioAPI.DataServices.DataAccessors
 {
@@ -33,7 +34,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="githubUser">The github user to add</param>
         /// <returns>Success determinator</returns>
-        public DataResponse AddGithubUser(GithubUser githubUser)
+        public DataResponse AddGithubUser(Models.GithubUser githubUser)
         {
             DataResponse response;
 
@@ -69,7 +70,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
 
             try
             {
-                GithubUser gu;
+                Models.GithubUser gu;
 
                 if ((gu = DbContext.GithubUsers.SingleOrDefault(v => v.GithubUserId == githubUserId)) == null)
                 {
@@ -102,30 +103,30 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="githubUserId">The github user's user id</param>
         /// <returns>The github user</returns>
-        public DataResponse<GithubUser> GetGithubUser(int githubUserId)
+        public DataResponse<Models.GithubUser> GetGithubUser(int githubUserId)
         {
-            DataResponse<GithubUser> response;
+            DataResponse<Models.GithubUser> response;
 
             try
             {
-                GithubUser gu;
+                Models.GithubUser gu;
                 if ((gu = DbContext.GithubUsers.SingleOrDefault(v => v.GithubUserId == githubUserId)) == null)
                 {
-                    response = new DataResponse<GithubUser>(DataStatusCode.INVALID, "Invalid github user id");
+                    response = new DataResponse<Models.GithubUser>(DataStatusCode.INVALID, "Invalid github user id");
                     return response;
                 }
 
-                response = new DataResponse<GithubUser>(gu, DataStatusCode.SUCCESS);
+                response = new DataResponse<Models.GithubUser>(gu, DataStatusCode.SUCCESS);
             }
             catch (SqlException ex)
             {
                 logger.Error("Sql exception on getting github user", ex);
-                response = new DataResponse<GithubUser>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.GithubUser>(DataStatusCode.ERROR);
             }
             catch (Exception ex)
             {
                 logger.Error("Exception on getting github user", ex);
-                response = new DataResponse<GithubUser>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.GithubUser>(DataStatusCode.ERROR);
             }
 
             return response;
@@ -136,30 +137,30 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="email">The github user's email address</param>
         /// <returns>The github user</returns>
-        public DataResponse<GithubUser> GetGithubUser(string email)
+        public DataResponse<Models.GithubUser> GetGithubUser(string email)
         {
-            DataResponse<GithubUser> response;
+            DataResponse<Models.GithubUser> response;
 
             try
             {
-                GithubUser gu;
+                Models.GithubUser gu;
                 if ((gu = DbContext.GithubUsers.SingleOrDefault(v => v.Username == email)) == null)
                 {
-                    response = new DataResponse<GithubUser>(DataStatusCode.INVALID, "Invalid github user email");
+                    response = new DataResponse<Models.GithubUser>(DataStatusCode.INVALID, "Invalid github user email");
                     return response;
                 }
 
-                response = new DataResponse<GithubUser>(gu, DataStatusCode.SUCCESS);
+                response = new DataResponse<Models.GithubUser>(gu, DataStatusCode.SUCCESS);
             }
             catch (SqlException ex)
             {
                 logger.Error("Sql exception on getting github user", ex);
-                response = new DataResponse<GithubUser>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.GithubUser>(DataStatusCode.ERROR);
             }
             catch (Exception ex)
             {
                 logger.Error("Exception on getting github user", ex);
-                response = new DataResponse<GithubUser>(DataStatusCode.ERROR);
+                response = new DataResponse<Models.GithubUser>(DataStatusCode.ERROR);
             }
 
             return response;
@@ -171,7 +172,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <param name="githubUserId">The github user's user id</param>
         /// <param name="githubUser">The github user to update</param>
         /// <returns>Success determinator</returns>
-        public DataResponse UpdateGithubUser(int githubUserId, GithubUser githubUser)
+        public DataResponse UpdateGithubUser(int githubUserId, Models.GithubUser githubUser)
         {
             DataResponse response;
 

@@ -1,10 +1,5 @@
-﻿using PortfolioAPI.DataServices.DataAccessors.Class;
-using PortfolioAPI.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PortfolioAPI.Models;
+using SandyModels.Models;
 
 namespace PortfolioAPI.DataServices.DataServiceInterfaces.DataAccessors
 {

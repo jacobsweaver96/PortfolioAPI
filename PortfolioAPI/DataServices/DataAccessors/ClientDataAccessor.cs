@@ -6,7 +6,8 @@ using System.Web;
 using PortfolioAPI.Models;
 using System.Data.SqlClient;
 using log4net;
-using PortfolioAPI.DataServices.DataAccessors.Class;
+using SandyUtils.Utils;
+using SandyModels.Models;
 
 namespace PortfolioAPI.DataServices.DataAccessors
 {

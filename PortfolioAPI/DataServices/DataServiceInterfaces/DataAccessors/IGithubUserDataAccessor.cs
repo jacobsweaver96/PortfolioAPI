@@ -1,5 +1,4 @@
-﻿using PortfolioAPI.DataServices.DataAccessors.Class;
-using PortfolioAPI.Models;
+﻿using SandyModels.Models;
 
 namespace PortfolioAPI.DataServices.DataServiceInterfaces.DataAccessors
 {
@@ -13,26 +12,26 @@ namespace PortfolioAPI.DataServices.DataServiceInterfaces.DataAccessors
         /// </summary>
         /// <param name="githubUserId">The github user's user id</param>
         /// <returns>The github user</returns>
-        DataResponse<GithubUser> GetGithubUser(int githubUserId);
+        DataResponse<Models.GithubUser> GetGithubUser(int githubUserId);
         /// <summary>
         /// Get a github user by email address
         /// </summary>
         /// <param name="email">The github user's email address</param>
         /// <returns>The github user</returns>
-        DataResponse<GithubUser> GetGithubUser(string email);
+        DataResponse<Models.GithubUser> GetGithubUser(string email);
         /// <summary>
         /// Add a github user
         /// </summary>
         /// <param name="githubUser">The github user to add</param>
         /// <returns>Success determinator</returns>
-        DataResponse AddGithubUser(GithubUser githubUser);
+        DataResponse AddGithubUser(Models.GithubUser githubUser);
         /// <summary>
         /// Update a github user
         /// </summary>
         /// <param name="githubUserId">The github user's user id</param>
         /// <param name="githubUser">The github user to update</param>
         /// <returns>Success determinator</returns>
-        DataResponse UpdateGithubUser(int githubUserId, GithubUser githubUser);
+        DataResponse UpdateGithubUser(int githubUserId, Models.GithubUser githubUser);
         /// <summary>
         /// Deletes a github user
         /// </summary>

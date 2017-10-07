@@ -1,11 +1,10 @@
 ﻿using log4net;
 using PortfolioAPI.DataServices.DataAccessors;
-using PortfolioAPI.DataServices.DataServiceInterfaces;
 using PortfolioAPI.Models;
-using System;
+using RestEasy.Services;
+using SandyModels.Models;
+using SandyUtils.Utils;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace PortfolioAPI.DataServices
 {
@@ -41,7 +40,7 @@ namespace PortfolioAPI.DataServices
         {
             var response = ClientAccessor.GetClient(clientKey);
 
-            if (response.Status != DataAccessors.Class.DataStatusCode.SUCCESS || !response.HasValue)
+            if (response.Status != DataStatusCode.SUCCESS || !response.HasValue)
             {
                 return false;
             }
@@ -79,7 +78,7 @@ namespace PortfolioAPI.DataServices
         {
             var response = ClientAccessor.GetClient(clientKey);
 
-            if (response.Status != DataAccessors.Class.DataStatusCode.SUCCESS || !response.HasValue)
+            if (response.Status != DataStatusCode.SUCCESS || !response.HasValue)
             {
                 return false;
             }

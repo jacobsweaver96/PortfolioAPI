@@ -1,14 +1,12 @@
 ﻿using PortfolioAPI.DataServices;
 using PortfolioAPI.Interfaces;
 using PortfolioAPI.Models;
-using PortfolioAPI.Util;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Web.Http;
 using log4net;
 using PortfolioAPI.DataServices.DataServiceInterfaces;
+using SandyUtils.Utils;
+using RestEasy.Services;
 
 namespace PortfolioAPI
 {
@@ -44,7 +42,8 @@ namespace PortfolioAPI
 
             // Database connection
             var pfConnString = ConfigurationManager.ConnectionStrings["PortfolioDBConnectionString"].ConnectionString;
-            var credentials = CredentialManager.GetCredentials("PortfolioDBConnectionString");
+            var credentialsFilePath = $"{ConfigurationManager.AppSettings["CredentialsFileName"]}";
+            var credentials = CredentialManager.GetCredentials("PortfolioDBConnectionString", credentialsFilePath);
             pfConnString = $"{pfConnString};User Id={credentials.UserId};Password={credentials.Password}";
             var dbCtx = new PortfolioDBDataContext(pfConnString);
             PortfolioDataAccessService portfolioService = new PortfolioDataAccessService(dbCtx);

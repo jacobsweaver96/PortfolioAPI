@@ -1,16 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
-using PortfolioModels.Models;
-using PortfolioAPI.ControllerAttributes;
+using SandyModels.Models;
 using PortfolioAPI.Util;
-using ApiModels.Models.Response;
+using SandyModels.Models.ApiModels;
 using System;
+using System.Reflection;
+using PortfolioAPI.Interfaces;
+using RestEasy.Controllers;
+using SandyUtils.Utils;
+using RestEasy.Attributes;
 
 namespace PortfolioAPI.Controllers
 {
     [RoutePrefix("api/Users")]
     public sealed class UsersController : RestController
     {
+        private IDataAccessService DataAccessService
+        {
+            get
+            {
+                return DependencyResolver.Resolve<IDataAccessService>();
+            }
+        }
+
         protected override List<RestController> RelatedEndpoints
         {
             get
@@ -37,7 +49,8 @@ namespace PortfolioAPI.Controllers
         [RequiresReadAccess]
         public ApiResponse Get(int UserId)
         {
-            var response = CreateRestResponse(() =>
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(),
+            () =>
             {
                 return DataAccessService.UserDataAccessor.GetUser(UserId);
                 
@@ -52,7 +65,8 @@ namespace PortfolioAPI.Controllers
         [RequiresWriteAccess]
         public ApiResponse Post([FromBody]User value)
         {
-            var response = CreateRestResponse(() =>
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            () =>
             {
                 var user = ModelConverter.ToDbUser(value);
 
@@ -68,7 +82,8 @@ namespace PortfolioAPI.Controllers
         [RequiresWriteAccess]
         public ApiResponse Put([FromBody]User value)
         {
-            var response = CreateRestResponse(() =>
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            () =>
             {
                 var user = ModelConverter.ToDbUser(value);
 
@@ -84,7 +99,8 @@ namespace PortfolioAPI.Controllers
         [RequiresWriteAccess]
         public ApiResponse Put(int userId, int roleId)
         {
-            var response = CreateRestResponse(() =>
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            () =>
             {
                 return DataAccessService.UserDataAccessor.AddRoleToUser(userId, roleId);
             });
@@ -98,7 +114,8 @@ namespace PortfolioAPI.Controllers
         [RequiresWriteAccess]
         public ApiResponse Delete(int UserId)
         {
-            var response = CreateRestResponse(() =>
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            () =>
             {
                 return DataAccessService.UserDataAccessor.DeleteUser(UserId);
             });
@@ -112,7 +129,8 @@ namespace PortfolioAPI.Controllers
         [RequiresWriteAccess]
         public ApiResponse Delete(int userId, int roleId)
         {
-            var response = CreateRestResponse(() =>
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            () =>
             {
                 return DataAccessService.UserDataAccessor.RemoveRoleFromUser(userId, roleId);
             });
