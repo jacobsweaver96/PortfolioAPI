@@ -8,6 +8,7 @@ using PortfolioAPI.Interfaces;
 using RestEasy.Controllers;
 using SandyUtils.Utils;
 using RestEasy.Attributes;
+using System.Threading.Tasks;
 
 namespace PortfolioAPI.Controllers
 {
@@ -39,28 +40,28 @@ namespace PortfolioAPI.Controllers
         [Route("{GithubUserId:int}")]
         [RestInfo("GET", "Get github user with {GithubUserId}")]
         [RequiresReadAccess]
-        public ApiResponse Get(int GithubUserId)
+        public async Task<ApiResponse<GithubUser>> Get(int GithubUserId)
         {
             var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
-            () =>
+            async () =>
             {
-                return DataAccessService.GithubUserDataAccessor.GetGithubUser(GithubUserId);
+                return await DataAccessService.GithubUserDataAccessor.GetGithubUser(GithubUserId);
             }, (Models.GithubUser o) => { return ModelConverter.ToSerializableGithubUser(o); });
 
-            return response;
+            return await response;
         }
         
         [HttpPost]
         [Route("")]
         [RestInfo("POST", "Update github user", "GithubUser")]
         [RequiresWriteAccess]
-        public ApiResponse Post([FromBody]GithubUser value)
+        public async Task<ApiResponse> Post([FromBody]GithubUser value)
         {
-            return CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
-            () =>
+            return await CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            async () =>
             {
                 var gUser = ModelConverter.ToDbGithubUser(value);
-                return DataAccessService.GithubUserDataAccessor.UpdateGithubUser(value.GithubUserId, gUser);
+                return await DataAccessService.GithubUserDataAccessor.UpdateGithubUser(value.GithubUserId, gUser);
             });
         }
         
@@ -68,13 +69,13 @@ namespace PortfolioAPI.Controllers
         [Route("")]
         [RestInfo("PUT", "Create github user", "GithubUser")]
         [RequiresWriteAccess]
-        public ApiResponse Put([FromBody]GithubUser value)
+        public async Task<ApiResponse> Put([FromBody]GithubUser value)
         {
-            return CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
-            () =>
+            return await CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            async () =>
             {
                 var gUser = ModelConverter.ToDbGithubUser(value);
-                return DataAccessService.GithubUserDataAccessor.AddGithubUser(gUser);
+                return await DataAccessService.GithubUserDataAccessor.AddGithubUser(gUser);
             });
         }
         
@@ -82,12 +83,12 @@ namespace PortfolioAPI.Controllers
         [Route("{GithubUserId:int}")]
         [RestInfo("DELETE", "Delete github user with {GithubUserId}")]
         [RequiresWriteAccess]
-        public ApiResponse Delete(int GithubUserId)
+        public async Task<ApiResponse> Delete(int GithubUserId)
         {
-            return CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
-            () =>
+            return await CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
+            async () =>
             {
-                return DataAccessService.GithubUserDataAccessor.DeleteGithubUser(GithubUserId);
+                return await DataAccessService.GithubUserDataAccessor.DeleteGithubUser(GithubUserId);
             });
         }
     }

@@ -1,5 +1,6 @@
 ﻿using PortfolioAPI.Models;
 using SandyModels.Models;
+using System.Threading.Tasks;
 
 namespace PortfolioAPI.DataServices.DataServiceInterfaces.DataAccessors
 {
@@ -13,6 +14,6 @@ namespace PortfolioAPI.DataServices.DataServiceInterfaces.DataAccessors
         /// </summary>
         /// <param name="clientKey">The key that identifies the client</param>
         /// <returns>The client</returns>
-        DataResponse<Client> GetClient(string clientKey);
+        Task<DataResponse<Client>> GetClient(string clientKey);
     }
 }

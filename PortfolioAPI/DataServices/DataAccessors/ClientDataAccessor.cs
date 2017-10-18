@@ -8,6 +8,8 @@ using System.Data.SqlClient;
 using log4net;
 using SandyUtils.Utils;
 using SandyModels.Models;
+using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace PortfolioAPI.DataServices.DataAccessors
 {
@@ -16,7 +18,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
     /// </summary>
     public class ClientDataAccessor : IClientDataAccessor
     {
-        private PortfolioDBDataContext DbContext { get; set; }
+        private string DbContextStr { get; set; }
         private ILog logger
         {
             get { return DependencyResolver.Resolve<ILog>(); }
@@ -25,10 +27,10 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="ctx">Injects the data context</param>
-        public ClientDataAccessor(PortfolioDBDataContext ctx)
+        /// <param name="ctxStr">Injects the data context</param>
+        public ClientDataAccessor(string ctxStr)
         {
-            DbContext = ctx;
+            DbContextStr = ctxStr;
         }
 
         /// <summary>
@@ -36,7 +38,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="clientKey">The clients unique key</param>
         /// <returns></returns>
-        public DataResponse<Client> GetClient(string clientKey)
+        public async Task<DataResponse<Client>> GetClient(string clientKey)
         {
             DataResponse<Client> response;
             Client client = null;
@@ -48,7 +50,11 @@ namespace PortfolioAPI.DataServices.DataAccessors
 
             try
             {
-                client = DbContext.Clients.SingleOrDefault(v => v.ClientKey == clientKey);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    client = await DbContext.Clients.SingleOrDefaultAsync(v => v.ClientKey == clientKey);
+                });
+
                 response = new DataResponse<Client>(client, DataStatusCode.SUCCESS);
             }
             catch (SqlException ex)

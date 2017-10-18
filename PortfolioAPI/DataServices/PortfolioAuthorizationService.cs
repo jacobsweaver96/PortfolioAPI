@@ -5,6 +5,7 @@ using RestEasy.Services;
 using SandyModels.Models;
 using SandyUtils.Utils;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PortfolioAPI.DataServices
 {
@@ -13,7 +14,6 @@ namespace PortfolioAPI.DataServices
     /// </summary>
     public class PortfolioAuthorizationService : IAuthorizationService
     {
-        private PortfolioDBDataContext DbContext { get; set; }
         private ILog logger
         {
             get { return DependencyResolver.Resolve<ILog>(); }
@@ -25,7 +25,7 @@ namespace PortfolioAPI.DataServices
         /// Constructor
         /// </summary>
         /// <param name="ctx">Injects the data context</param>
-        public PortfolioAuthorizationService(PortfolioDBDataContext ctx)
+        public PortfolioAuthorizationService(string ctx)
         {
             ClientAccessor = new ClientDataAccessor(ctx);
         }
@@ -36,9 +36,9 @@ namespace PortfolioAPI.DataServices
         /// <param name="clientKey">The client's identifying key</param>
         /// <param name="requiredPermissionLevel">The required permissions to perform the action</param>
         /// <returns>Authorization determinator</returns>
-        public bool Authorize(string clientKey, PermissionLevel requiredPermissionLevel)
+        public async Task<bool> Authorize(string clientKey, PermissionLevel requiredPermissionLevel)
         {
-            var response = ClientAccessor.GetClient(clientKey);
+            var response = await ClientAccessor.GetClient(clientKey);
 
             if (response.Status != DataStatusCode.SUCCESS || !response.HasValue)
             {
@@ -74,9 +74,9 @@ namespace PortfolioAPI.DataServices
         /// <param name="clientKey">The client's identifying key</param>
         /// <param name="requiredPermissionLevels">The required permissions to perform the action</param>
         /// <returns>Authorization determinator</returns>
-        public bool Authorize(string clientKey, List<PermissionLevel> requiredPermissionLevels)
+        public async Task<bool> Authorize(string clientKey, List<PermissionLevel> requiredPermissionLevels)
         {
-            var response = ClientAccessor.GetClient(clientKey);
+            var response = await ClientAccessor.GetClient(clientKey);
 
             if (response.Status != DataStatusCode.SUCCESS || !response.HasValue)
             {

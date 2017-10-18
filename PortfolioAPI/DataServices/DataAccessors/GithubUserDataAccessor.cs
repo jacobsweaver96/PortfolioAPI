@@ -6,6 +6,8 @@ using log4net;
 using System.Data.SqlClient;
 using SandyModels.Models;
 using SandyUtils.Utils;
+using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace PortfolioAPI.DataServices.DataAccessors
 {
@@ -14,7 +16,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
     /// </summary>
     public class GithubUserDataAccessor : IGithubUserDataAccessor
     {
-        private PortfolioDBDataContext DbContext { get; set; }
+        private string DbContextStr { get; set; }
         private ILog logger
         {
             get { return DependencyResolver.Resolve<ILog>(); }
@@ -23,10 +25,10 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="dbCxt">The database context</param>
-        public GithubUserDataAccessor(PortfolioDBDataContext dbCxt)
+        /// <param name="ctxStr">The database context</param>
+        public GithubUserDataAccessor(string ctxStr)
         {
-            DbContext = dbCxt;
+            DbContextStr = ctxStr;
         }
 
         /// <summary>
@@ -34,14 +36,18 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="githubUser">The github user to add</param>
         /// <returns>Success determinator</returns>
-        public DataResponse AddGithubUser(Models.GithubUser githubUser)
+        public async Task<DataResponse> AddGithubUser(Models.GithubUser githubUser)
         {
             DataResponse response;
 
             try
             {
-                DbContext.GithubUsers.InsertOnSubmit(githubUser);
-                DbContext.SubmitChanges();
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    DbContext.GithubUsers.Add(githubUser);
+                    await DbContext.SaveChangesAsync();
+                });
+                
                 response = new DataResponse(DataStatusCode.SUCCESS);
                 return response;
             }
@@ -64,24 +70,30 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="githubUserId">The github user's user id</param>
         /// <returns>Success determinator</returns>
-        public DataResponse DeleteGithubUser(int githubUserId)
+        public async Task<DataResponse> DeleteGithubUser(int githubUserId)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
                 Models.GithubUser gu;
 
-                if ((gu = DbContext.GithubUsers.SingleOrDefault(v => v.GithubUserId == githubUserId)) == null)
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
                 {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid github user id");
-                    return response;
-                }
+                    gu = await DbContext.GithubUsers.SingleOrDefaultAsync(v => v.GithubUserId == githubUserId);
 
-                gu.IsDeleted = true;
-                DbContext.SubmitChanges();
+                    if (gu == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid github user id");
+                        return;
+                    }
 
-                response = new DataResponse(DataStatusCode.SUCCESS);
+                    gu.IsDeleted = true;
+                    await DbContext.SaveChangesAsync();
+
+                    response = new DataResponse(DataStatusCode.SUCCESS);
+                });
+
                 return response;
             }
             catch (SqlException ex)
@@ -103,20 +115,26 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="githubUserId">The github user's user id</param>
         /// <returns>The github user</returns>
-        public DataResponse<Models.GithubUser> GetGithubUser(int githubUserId)
+        public async Task<DataResponse<Models.GithubUser>> GetGithubUser(int githubUserId)
         {
-            DataResponse<Models.GithubUser> response;
+            DataResponse<Models.GithubUser> response = null;
 
             try
             {
                 Models.GithubUser gu;
-                if ((gu = DbContext.GithubUsers.SingleOrDefault(v => v.GithubUserId == githubUserId)) == null)
+                
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
                 {
-                    response = new DataResponse<Models.GithubUser>(DataStatusCode.INVALID, "Invalid github user id");
-                    return response;
-                }
+                    gu = await DbContext.GithubUsers.SingleOrDefaultAsync(v => v.GithubUserId == githubUserId);
 
-                response = new DataResponse<Models.GithubUser>(gu, DataStatusCode.SUCCESS);
+                    if (gu == null)
+                    {
+                        response = new DataResponse<Models.GithubUser>(DataStatusCode.INVALID, "Invalid github user id");
+                        return;
+                    }
+
+                    response = new DataResponse<Models.GithubUser>(gu, DataStatusCode.SUCCESS);
+                });
             }
             catch (SqlException ex)
             {
@@ -137,20 +155,26 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="email">The github user's email address</param>
         /// <returns>The github user</returns>
-        public DataResponse<Models.GithubUser> GetGithubUser(string email)
+        public async Task<DataResponse<Models.GithubUser>> GetGithubUser(string email)
         {
-            DataResponse<Models.GithubUser> response;
+            DataResponse<Models.GithubUser> response = null;
 
             try
             {
                 Models.GithubUser gu;
-                if ((gu = DbContext.GithubUsers.SingleOrDefault(v => v.Username == email)) == null)
-                {
-                    response = new DataResponse<Models.GithubUser>(DataStatusCode.INVALID, "Invalid github user email");
-                    return response;
-                }
 
-                response = new DataResponse<Models.GithubUser>(gu, DataStatusCode.SUCCESS);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    gu = await DbContext.GithubUsers.SingleOrDefaultAsync(v => v.Username == email);
+
+                    if (gu == null)
+                    {
+                        response = new DataResponse<Models.GithubUser>(DataStatusCode.INVALID, "Invalid github user email");
+                        return;
+                    }
+
+                    response = new DataResponse<Models.GithubUser>(gu, DataStatusCode.SUCCESS);
+                });
             }
             catch (SqlException ex)
             {
@@ -172,25 +196,29 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <param name="githubUserId">The github user's user id</param>
         /// <param name="githubUser">The github user to update</param>
         /// <returns>Success determinator</returns>
-        public DataResponse UpdateGithubUser(int githubUserId, Models.GithubUser githubUser)
+        public async Task<DataResponse> UpdateGithubUser(int githubUserId, Models.GithubUser githubUser)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                var dbGithubUser = DbContext.GithubUsers.SingleOrDefault(v => v.GithubUserId == githubUserId);
-
-                if (dbGithubUser == null)
+                
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
                 {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid github user id");
-                    return response;
-                }
+                    var dbGithubUser = await DbContext.GithubUsers.SingleOrDefaultAsync(v => v.GithubUserId == githubUserId);
 
-                dbGithubUser.IsDeleted = githubUser.IsDeleted;
-                dbGithubUser.UserId = githubUser.UserId;
-                dbGithubUser.Username = githubUser.Username;
+                    if (dbGithubUser == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid github user id");
+                        return;
+                    }
 
-                response = new DataResponse(DataStatusCode.SUCCESS);
+                    dbGithubUser.IsDeleted = githubUser.IsDeleted;
+                    dbGithubUser.UserId = githubUser.UserId;
+                    dbGithubUser.Username = githubUser.Username;
+
+                    response = new DataResponse(DataStatusCode.SUCCESS);
+                });
             }
             catch (SqlException ex)
             {

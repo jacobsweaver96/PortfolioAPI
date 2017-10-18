@@ -1,4 +1,5 @@
 ﻿using SandyModels.Models;
+using System.Threading.Tasks;
 
 namespace PortfolioAPI.DataServices.DataServiceInterfaces.DataAccessors
 {
@@ -12,31 +13,31 @@ namespace PortfolioAPI.DataServices.DataServiceInterfaces.DataAccessors
         /// </summary>
         /// <param name="githubUserId">The github user's user id</param>
         /// <returns>The github user</returns>
-        DataResponse<Models.GithubUser> GetGithubUser(int githubUserId);
+        Task<DataResponse<Models.GithubUser>> GetGithubUser(int githubUserId);
         /// <summary>
         /// Get a github user by email address
         /// </summary>
         /// <param name="email">The github user's email address</param>
         /// <returns>The github user</returns>
-        DataResponse<Models.GithubUser> GetGithubUser(string email);
+        Task<DataResponse<Models.GithubUser>> GetGithubUser(string email);
         /// <summary>
         /// Add a github user
         /// </summary>
         /// <param name="githubUser">The github user to add</param>
         /// <returns>Success determinator</returns>
-        DataResponse AddGithubUser(Models.GithubUser githubUser);
+        Task<DataResponse> AddGithubUser(Models.GithubUser githubUser);
         /// <summary>
         /// Update a github user
         /// </summary>
         /// <param name="githubUserId">The github user's user id</param>
         /// <param name="githubUser">The github user to update</param>
         /// <returns>Success determinator</returns>
-        DataResponse UpdateGithubUser(int githubUserId, Models.GithubUser githubUser);
+        Task<DataResponse> UpdateGithubUser(int githubUserId, Models.GithubUser githubUser);
         /// <summary>
         /// Deletes a github user
         /// </summary>
         /// <param name="githubUserId">The github user's user id</param>
         /// <returns>Success determinator</returns>
-        DataResponse DeleteGithubUser(int githubUserId);
+        Task<DataResponse> DeleteGithubUser(int githubUserId);
     }
 }

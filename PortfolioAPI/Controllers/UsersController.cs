@@ -9,6 +9,7 @@ using PortfolioAPI.Interfaces;
 using RestEasy.Controllers;
 using SandyUtils.Utils;
 using RestEasy.Attributes;
+using System.Threading.Tasks;
 
 namespace PortfolioAPI.Controllers
 {
@@ -47,95 +48,111 @@ namespace PortfolioAPI.Controllers
         [Route("{UserId:int}")]
         [RestInfo("GET", "Get user with {UserId}")]
         [RequiresReadAccess]
-        public ApiResponse Get(int UserId)
+        public async Task<ApiResponse<User>> Get(int UserId)
         {
             var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(),
-            () =>
+            async () =>
             {
-                return DataAccessService.UserDataAccessor.GetUser(UserId);
+                return await DataAccessService.UserDataAccessor.GetUser(UserId);
                 
             }, (Models.User o) => { return ModelConverter.ToSerializableUser(o); });
 
-            return response;
+            return await response;
         }
-        
+
+        [HttpGet]
+        [Route("{Username}")]
+        [RestInfo("GET", "Get user with {Username}")]
+        [RequiresReadAccess]
+        public async Task<ApiResponse<User>> Get(string Username)
+        {
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(),
+            async () =>
+            {
+                return await DataAccessService.UserDataAccessor.GetUser(Username);
+
+            }, (Models.User o) => { return ModelConverter.ToSerializableUser(o); });
+
+            return await response;
+        }
+
         [HttpPost]
         [Route("")]
         [RestInfo("POST", "Update user", "User")]
         [RequiresWriteAccess]
-        public ApiResponse Post([FromBody]User value)
+        public async Task<ApiResponse> Post([FromBody]User value)
         {
             var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
-            () =>
+            async () =>
             {
                 var user = ModelConverter.ToDbUser(value);
 
-                return DataAccessService.UserDataAccessor.UpdateUser(user.UserId, user);
+                return await DataAccessService.UserDataAccessor.UpdateUser(user.UserId, user);
             });
 
-            return response;
+            return await response;
         }
         
         [HttpPut]
         [Route("")]
         [RestInfo("PUT", "Create user", "User")]
         [RequiresWriteAccess]
-        public ApiResponse Put([FromBody]User value)
+        public async Task<ApiResponse> Put([FromBody]User value)
         {
             var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
-            () =>
+            async () =>
             {
                 var user = ModelConverter.ToDbUser(value);
 
-                return DataAccessService.UserDataAccessor.AddUser(user);
+                return await DataAccessService.UserDataAccessor.AddUser(user);
             });
 
-            return response;
+            return await response;
         }
 
         [HttpPut]
         [Route("{userId:int}/Roles/{roleId:int}")]
         [RestInfo("PUT", "Add a role with {roleId} to user with {userId}")]
         [RequiresWriteAccess]
-        public ApiResponse Put(int userId, int roleId)
+        public async Task<ApiResponse> Put(int userId, int roleId)
         {
             var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
-            () =>
+            async () =>
             {
-                return DataAccessService.UserDataAccessor.AddRoleToUser(userId, roleId);
+                return await DataAccessService.UserDataAccessor.AddRoleToUser(userId, roleId);
             });
 
-            return response;
+            return await response;
         }
         
         [HttpDelete]
         [Route("{UserId:int}")]
         [RestInfo("DELETE", "Delete user with {UserId}")]
         [RequiresWriteAccess]
-        public ApiResponse Delete(int UserId)
+        public async Task<ApiResponse> Delete(int UserId)
         {
             var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
-            () =>
+            async () =>
             {
-                return DataAccessService.UserDataAccessor.DeleteUser(UserId);
+                return await DataAccessService.UserDataAccessor.DeleteUser(UserId);
             });
 
-            return response;
+            return await response;
         }
 
         [HttpDelete]
         [Route("{userId:int}/Roles/{roleId:int}")]
         [RestInfo("DELETE", "Remove a role with {roleId} from user with {userId}")]
         [RequiresWriteAccess]
-        public ApiResponse Delete(int userId, int roleId)
+        public async Task<ApiResponse> Delete(int userId, int roleId)
         {
             var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(), 
-            () =>
+            async () =>
             {
-                return DataAccessService.UserDataAccessor.RemoveRoleFromUser(userId, roleId);
+                return await DataAccessService.UserDataAccessor.RemoveRoleFromUser(userId, roleId);
             });
 
-            return response;
+            return await response;
         }
     }
 }

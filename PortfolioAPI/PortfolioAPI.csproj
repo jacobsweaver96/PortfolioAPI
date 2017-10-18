@@ -19,10 +19,10 @@
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
-    <IISExpressSSLPort />
-    <IISExpressAnonymousAuthentication />
-    <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
+    <IISExpressSSLPort>30006</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -48,6 +48,12 @@
     <FilesToIncludeForPublish>AllFilesInTheProject</FilesToIncludeForPublish>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
@@ -65,18 +71,19 @@
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="RestEasy, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestEasy.1.0.0\lib\RestEasy.dll</HintPath>
+      <HintPath>..\packages\RestEasy.1.0.1\lib\RestEasy.dll</HintPath>
     </Reference>
     <Reference Include="SandyModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SandyModels.1.0.2\lib\SandyModels.dll</HintPath>
+      <HintPath>..\packages\SandyModels.1.0.3\lib\SandyModels.dll</HintPath>
     </Reference>
     <Reference Include="SandyUtils, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SandyUtils.1.0.1\lib\SandyUtils.dll</HintPath>
+      <HintPath>..\packages\SandyUtils.1.0.3\lib\SandyUtils.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Spatial, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Spatial.5.6.0\lib\net40\System.Spatial.dll</HintPath>
     </Reference>
@@ -179,6 +186,7 @@
     <Compile Include="Controllers\GithubUsersController.cs" />
     <Compile Include="Controllers\RoleController.cs" />
     <Compile Include="DataServices\DataAccessors\ClientDataAccessor.cs" />
+    <Compile Include="DataServices\DataAccessors\DbCtxLifespanHelper.cs" />
     <Compile Include="DataServices\DataAccessors\UserDataAccessor.cs" />
     <Compile Include="DataServices\DataServiceInterfaces\DataAccessors\IClientDataAccessor.cs" />
     <Compile Include="DataServices\DataServiceInterfaces\DataAccessors\IGithubUserDataAccessor.cs" />
@@ -191,37 +199,71 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\PortfolioDB.cs">
-      <DependentUpon>PortfolioDB.dbml</DependentUpon>
+    <Compile Include="Models\ApiPermission.cs">
+      <DependentUpon>PortfolioDb.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\PortfolioDB.designer.cs">
+    <Compile Include="Models\Client.cs">
+      <DependentUpon>PortfolioDb.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GithubUser.cs">
+      <DependentUpon>PortfolioDb.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PortfolioDb.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>PortfolioDB.dbml</DependentUpon>
+      <DependentUpon>PortfolioDb.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PortfolioDb1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PortfolioDb.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PortfolioDb1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PortfolioDb.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Role.cs">
+      <DependentUpon>PortfolioDb.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\User.cs">
+      <DependentUpon>PortfolioDb.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UserRole_Map.cs">
+      <DependentUpon>PortfolioDb.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\ModelConverter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\Credentials.crd.xml">
+    <EmbeddedResource Include="App_Data\Credentials.crd.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
-    </Content>
+    </EmbeddedResource>
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Models\PortfolioDB.dbml">
-      <Generator>MSLinqToSQLGenerator</Generator>
-      <LastGenOutput>PortfolioDB.designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="log4net.config" />
-    <None Include="Models\PortfolioDB.dbml.layout">
-      <DependentUpon>PortfolioDB.dbml</DependentUpon>
-    </None>
+    <Content Include="Models\PortfolioDb.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>PortfolioDb.edmx</DependentUpon>
+      <LastGenOutput>PortfolioDb.Context.cs</LastGenOutput>
+    </Content>
+    <EntityDeploy Include="Models\PortfolioDb.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>PortfolioDb1.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\PortfolioDb.edmx.diagram">
+      <DependentUpon>PortfolioDb.edmx</DependentUpon>
+    </Content>
     <None Include="Properties\PublishProfiles\PortfolioAPI - Web Deploy.pubxml" />
+    <Content Include="Models\PortfolioDb.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>PortfolioDb.edmx</DependentUpon>
+      <LastGenOutput>PortfolioDb1.cs</LastGenOutput>
+    </Content>
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -233,13 +275,14 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

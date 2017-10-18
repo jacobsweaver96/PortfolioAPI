@@ -14,7 +14,7 @@ namespace PortfolioAPI.DataServices
         /// Constructor
         /// </summary>
         /// <param name="DbCxt">The database context</param>
-        public PortfolioDataAccessService(PortfolioDBDataContext DbCxt)
+        public PortfolioDataAccessService(string DbCxt)
         {
             UserDataAccessor = new UserDataAccessor(DbCxt);
             GithubUserDataAccessor = new GithubUserDataAccessor(DbCxt);

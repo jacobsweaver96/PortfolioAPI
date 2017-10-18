@@ -48,7 +48,7 @@ namespace PortfolioAPI.Util
                     Email = user.Email,
                     Password = user.Password,
                     Salt = user.Salt,
-                    Roles = user.UserRole_Maps
+                    Roles = user.UserRole_Map
                             .Where(v => !v.IsDeleted)
                             .Select(v => ToSeriazlizableRole(v.Role))
                             .Where(v => !v.IsDeleted)

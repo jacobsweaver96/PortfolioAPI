@@ -7,6 +7,8 @@ using PortfolioAPI.DataServices.DataServiceInterfaces.DataAccessors;
 using System.Collections.Generic;
 using SandyUtils.Utils;
 using SandyModels.Models;
+using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace PortfolioAPI.DataServices.DataAccessors
 {
@@ -15,7 +17,7 @@ namespace PortfolioAPI.DataServices.DataAccessors
     /// </summary>
     public class UserDataAccessor : IUserDataAccessor
     {
-        private PortfolioDBDataContext DbContext { get; set; }
+        private string DbContextStr { get; set; }
         private ILog logger
         {
             get { return DependencyResolver.Resolve<ILog>(); }
@@ -24,10 +26,10 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="ctx">Injects the data context</param>
-        public UserDataAccessor(PortfolioDBDataContext ctx)
+        /// <param name="ctxStr">Injects the data context</param>
+        public UserDataAccessor(string ctxStr)
         {
-            DbContext = ctx;
+            DbContextStr = ctxStr;
         }
 
         /// <summary>
@@ -36,23 +38,28 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <param name="UserId">The user's id</param>
         /// <param name="githubUser">The github account</param>
         /// <returns>Success determinator</returns>
-        public DataResponse AddGithubAccount(int UserId, Models.GithubUser githubUser)
+        public async Task<DataResponse> AddGithubAccount(int UserId, Models.GithubUser githubUser)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                if (DbContext.Users.SingleOrDefault(v => v.UserId == UserId) == null)
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
                 {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
-                    return response;
-                }
+                    var user = await DbContext.Users.SingleOrDefaultAsync(v => v.UserId == UserId);
 
-                githubUser.UserId = UserId;
-                DbContext.GithubUsers.InsertOnSubmit(githubUser);
-                DbContext.SubmitChanges();
+                    if (user == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
+                        return;
+                    }
 
-                response = new DataResponse(DataStatusCode.SUCCESS);
+                    githubUser.UserId = UserId;
+                    DbContext.GithubUsers.Add(githubUser);
+                    await DbContext.SaveChangesAsync();
+
+                    response = new DataResponse(DataStatusCode.SUCCESS);
+                });
             }
             catch (SqlException ex)
             {
@@ -73,14 +80,19 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="user">The user to add</param>
         /// <returns>Success determinator</returns>
-        public DataResponse AddUser(Models.User user)
+        public async Task<DataResponse> AddUser(Models.User user)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                DbContext.Users.InsertOnSubmit(user);
-                response = new DataResponse(DataStatusCode.SUCCESS);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    DbContext.Users.Add(user);
+                    await DbContext.SaveChangesAsync();
+
+                    response = new DataResponse(DataStatusCode.SUCCESS);
+                });
             }
             catch (SqlException ex)
             {
@@ -101,24 +113,27 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="UserId">The user's id</param>
         /// <returns>Success determinator</returns>
-        public DataResponse DeleteUser(int UserId)
+        public async Task<DataResponse> DeleteUser(int UserId)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                var user = DbContext.Users.SingleOrDefault(v => v.UserId == UserId);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    var user = await DbContext.Users.SingleOrDefaultAsync(v => v.UserId == UserId);
 
-                if (user == null)
-                {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
-                }
-                else
-                {
-                    user.IsDeleted = true;
-                    DbContext.SubmitChanges();
-                    response = new DataResponse(DataStatusCode.SUCCESS);
-                }
+                    if (user == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
+                    }
+                    else
+                    {
+                        user.IsDeleted = true;
+                        await DbContext.SaveChangesAsync();
+                        response = new DataResponse(DataStatusCode.SUCCESS);
+                    }
+                });
             }
             catch (SqlException ex)
             {
@@ -139,22 +154,25 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="UserId">The user's id</param>
         /// <returns>The user</returns>
-        public DataResponse<Models.User> GetUser(int UserId)
+        public async Task<DataResponse<Models.User>> GetUser(int UserId)
         {
-            DataResponse<Models.User> response;
+            DataResponse<Models.User> response = null;
 
             try
             {
-                var user = DbContext.Users.SingleOrDefault(v => v.UserId == UserId);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    var user = await DbContext.Users.SingleOrDefaultAsync(v => v.UserId == UserId);
 
-                if (user == null)
-                {
-                    response = new DataResponse<Models.User>(DataStatusCode.INVALID, "Invalid user id");
-                }
-                else
-                {
-                    response = new DataResponse<Models.User>(user, DataStatusCode.SUCCESS);
-                }
+                    if (user == null)
+                    {
+                        response = new DataResponse<Models.User>(DataStatusCode.INVALID, "Invalid user id");
+                    }
+                    else
+                    {
+                        response = new DataResponse<Models.User>(user, DataStatusCode.SUCCESS);
+                    }
+                });
             }
             catch (SqlException ex)
             {
@@ -175,22 +193,25 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="email">The user's email address / username</param>
         /// <returns>The user</returns>
-        public DataResponse<Models.User> GetUser(string email)
+        public async Task<DataResponse<Models.User>> GetUser(string email)
         {
-            DataResponse<Models.User> response;
+            DataResponse<Models.User> response = null;
 
             try
             {
-                var user = DbContext.Users.SingleOrDefault(v => v.Email == email);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    var user = await DbContext.Users.SingleOrDefaultAsync(v => v.Email == email);
 
-                if (user == null)
-                {
-                    response = new DataResponse<Models.User>(DataStatusCode.INVALID, "Invalid user id");
-                }
-                else
-                {
-                    response = new DataResponse<Models.User>(user, DataStatusCode.SUCCESS);
-                } 
+                    if (user == null)
+                    {
+                        response = new DataResponse<Models.User>(DataStatusCode.INVALID, "Invalid user id");
+                    }
+                    else
+                    {
+                        response = new DataResponse<Models.User>(user, DataStatusCode.SUCCESS);
+                    }
+                });
             }
             catch (SqlException ex)
             {
@@ -211,31 +232,34 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="UserId">The user's id</param>
         /// <returns>Success determinator</returns>
-        public DataResponse RemoveGithubAccounts(int UserId)
+        public async Task<DataResponse> RemoveGithubAccounts(int UserId)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                var user = DbContext.Users.SingleOrDefault(v => v.UserId == UserId);
-
-                if (user == null)
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
                 {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
-                }
-                else
-                {
-                    var githubAccounts = user.GithubUsers;
+                    var user = await DbContext.Users.SingleOrDefaultAsync(v => v.UserId == UserId);
 
-                    foreach (var v in githubAccounts)
+                    if (user == null)
                     {
-                        v.IsDeleted = true;
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
                     }
+                    else
+                    {
+                        var githubAccounts = user.GithubUsers;
 
-                    DbContext.SubmitChanges();
+                        foreach (var v in githubAccounts)
+                        {
+                            v.IsDeleted = true;
+                        }
 
-                    response = new DataResponse(DataStatusCode.SUCCESS);
-                }                
+                        await DbContext.SaveChangesAsync();
+
+                        response = new DataResponse(DataStatusCode.SUCCESS);
+                    }
+                });
             }
             catch (SqlException ex)
             {
@@ -257,24 +281,27 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <param name="UserId">The user's id</param>
         /// <param name="GithubUsername">The github account's associated username</param>
         /// <returns>Success determinator</returns>
-        public DataResponse RemoveGithubAccount(int UserId, string GithubUsername)
+        public async Task<DataResponse> RemoveGithubAccount(int UserId, string GithubUsername)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                var githubUser = DbContext.GithubUsers.SingleOrDefault(v => v.UserId == UserId && v.Username == GithubUsername && !v.IsDeleted);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    var githubUser = DbContext.GithubUsers.SingleOrDefault(v => v.UserId == UserId && v.Username == GithubUsername && !v.IsDeleted);
 
-                if (githubUser == null)
-                {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid userId or username");
-                }
-                else
-                {
-                    githubUser.IsDeleted = true;
-                    DbContext.SubmitChanges();
-                    response = new DataResponse(DataStatusCode.SUCCESS);
-                }
+                    if (githubUser == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid userId or username");
+                    }
+                    else
+                    {
+                        githubUser.IsDeleted = true;
+                        await DbContext.SaveChangesAsync();
+                        response = new DataResponse(DataStatusCode.SUCCESS);
+                    }
+                });
             }
             catch (SqlException ex)
             {
@@ -296,26 +323,29 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <param name="UserId">The user's id</param>
         /// <param name="user">The user</param>
         /// <returns>Success determinator</returns>
-        public DataResponse UpdateUser(int UserId, Models.User user)
+        public async Task<DataResponse> UpdateUser(int UserId, Models.User user)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                var dbUser = DbContext.Users.SingleOrDefault(v => v.UserId == UserId);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    var dbUser = await DbContext.Users.SingleOrDefaultAsync(v => v.UserId == UserId);
 
-                if (dbUser == null)
-                {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
-                }
-                else
-                {
-                    dbUser.Password = user.Password;
-                    dbUser.Salt = user.Salt;
-                    dbUser.IsDeleted = user.IsDeleted;
-                    DbContext.SubmitChanges();
-                    response = new DataResponse(DataStatusCode.SUCCESS);
-                }
+                    if (dbUser == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
+                    }
+                    else
+                    {
+                        dbUser.Password = user.Password;
+                        dbUser.Salt = user.Salt;
+                        dbUser.IsDeleted = user.IsDeleted;
+                        await DbContext.SaveChangesAsync();
+                        response = new DataResponse(DataStatusCode.SUCCESS);
+                    }
+                });
             }
             catch (SqlException ex)
             {
@@ -337,48 +367,51 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <param name="UserId">The user's user id</param>
         /// <param name="RoleId">The role id</param>
         /// <returns>Success determinator</returns>
-        public DataResponse AddRoleToUser(int UserId, int RoleId)
+        public async Task<DataResponse> AddRoleToUser(int UserId, int RoleId)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                var user = DbContext.Users.SingleOrDefault(v => v.UserId == UserId);
-
-                if (user == null)
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
                 {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
-                    return response;
-                }
+                    var user = await DbContext.Users.SingleOrDefaultAsync(v => v.UserId == UserId);
 
-                var role = DbContext.Roles.SingleOrDefault(v => v.RoleId == RoleId);
-
-                if (role == null)
-                {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid role id");
-                    return response;
-                }
-
-                var existingRoleMap = DbContext.UserRole_Maps.SingleOrDefault(v => v.UserId == UserId && v.RoleId == RoleId);
-
-                if (existingRoleMap != null)
-                {
-                    existingRoleMap.IsDeleted = false;
-                }
-                else
-                {
-                    UserRole_Map newRoleMap = new UserRole_Map
+                    if (user == null)
                     {
-                        UserId = UserId,
-                        RoleId = RoleId,
-                        IsDeleted = false,
-                    };
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
+                        return;
+                    }
 
-                    DbContext.UserRole_Maps.InsertOnSubmit(newRoleMap);
-                }
+                    var role = await DbContext.Roles.SingleOrDefaultAsync(v => v.RoleId == RoleId);
 
-                DbContext.SubmitChanges();
-                response = new DataResponse(DataStatusCode.SUCCESS);
+                    if (role == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid role id");
+                        return;
+                    }
+
+                    var existingRoleMap = await DbContext.UserRole_Map.SingleOrDefaultAsync(v => v.UserId == UserId && v.RoleId == RoleId);
+
+                    if (existingRoleMap != null)
+                    {
+                        existingRoleMap.IsDeleted = false;
+                    }
+                    else
+                    {
+                        UserRole_Map newRoleMap = new UserRole_Map
+                        {
+                            UserId = UserId,
+                            RoleId = RoleId,
+                            IsDeleted = false,
+                        };
+
+                        DbContext.UserRole_Map.Add(newRoleMap);
+                    }
+
+                    await DbContext.SaveChangesAsync();
+                    response = new DataResponse(DataStatusCode.SUCCESS);
+                });
             }
             catch (SqlException ex)
             {
@@ -400,41 +433,44 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <param name="UserId">The user's user id</param>
         /// <param name="RoleId">The role id</param>
         /// <returns>Success determinator</returns>
-        public DataResponse RemoveRoleFromUser(int UserId, int RoleId)
+        public async Task<DataResponse> RemoveRoleFromUser(int UserId, int RoleId)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                var user = DbContext.Users.SingleOrDefault(v => v.UserId == UserId);
-
-                if (user == null)
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
                 {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
-                    return response;
-                }
+                    var user = DbContext.Users.SingleOrDefault(v => v.UserId == UserId);
 
-                var role = DbContext.Roles.SingleOrDefault(v => v.RoleId == RoleId);
-                
-                if (role == null)
-                {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid role id");
-                    return response;
-                }
+                    if (user == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid user id");
+                        return;
+                    }
 
-                var roleMap = DbContext.UserRole_Maps.SingleOrDefault(v => v.UserId == UserId && v.RoleId == RoleId && !v.IsDeleted);
+                    var role = DbContext.Roles.SingleOrDefault(v => v.RoleId == RoleId);
 
-                if (roleMap == null)
-                {
-                    response = new DataResponse(DataStatusCode.INVALID, "Given role is not assigned to user");
-                    return response;
-                }
-                else
-                {
-                    roleMap.IsDeleted = true;
-                    DbContext.SubmitChanges();
-                    response = new DataResponse(DataStatusCode.SUCCESS);
-                }
+                    if (role == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid role id");
+                        return;
+                    }
+
+                    var roleMap = await DbContext.UserRole_Map.SingleOrDefaultAsync(v => v.UserId == UserId && v.RoleId == RoleId && !v.IsDeleted);
+
+                    if (roleMap == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Given role is not assigned to user");
+                        return;
+                    }
+                    else
+                    {
+                        roleMap.IsDeleted = true;
+                        await DbContext.SaveChangesAsync();
+                        response = new DataResponse(DataStatusCode.SUCCESS);
+                    }
+                });
             }
             catch (SqlException ex)
             {
@@ -455,15 +491,18 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="role">The role to be added</param>
         /// <returns>Success determinator</returns>
-        public DataResponse AddRole(Models.Role role)
+        public async Task<DataResponse> AddRole(Models.Role role)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                DbContext.Roles.InsertOnSubmit(role);
-                DbContext.SubmitChanges();
-                response = new DataResponse(DataStatusCode.SUCCESS);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    DbContext.Roles.Add(role);
+                    await DbContext.SaveChangesAsync();
+                    response = new DataResponse(DataStatusCode.SUCCESS);
+                });
             }
             catch (SqlException ex)
             {
@@ -484,24 +523,27 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// </summary>
         /// <param name="roleId">The role id</param>
         /// <returns>Success determinator</returns>
-        public DataResponse DeleteRole(int roleId)
+        public async Task<DataResponse> DeleteRole(int roleId)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                var role = DbContext.Roles.SingleOrDefault(v => v.RoleId == roleId);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    var role = await DbContext.Roles.SingleOrDefaultAsync(v => v.RoleId == roleId);
 
-                if (role == null)
-                {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid role id");        
-                }
-                else
-                {
-                    role.IsDeleted = true;
-                    DbContext.SubmitChanges();
-                    response = new DataResponse(DataStatusCode.SUCCESS);
-                }
+                    if (role == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid role id");
+                    }
+                    else
+                    {
+                        role.IsDeleted = true;
+                        await DbContext.SaveChangesAsync();
+                        response = new DataResponse(DataStatusCode.SUCCESS);
+                    }
+                });
             }
             catch (SqlException ex)
             {
@@ -521,14 +563,17 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// Gets all active roles
         /// </summary>
         /// <returns>List of roles</returns>
-        public DataResponse<List<Models.Role>> GetRoles()
+        public async Task<DataResponse<List<Models.Role>>> GetRoles()
         {
-            DataResponse<List<Models.Role>> response;
+            DataResponse<List<Models.Role>> response = null;
 
             try
             {
-                var roles = DbContext.Roles.Where(v => !v.IsDeleted).ToList();
-                response = new DataResponse<List<Models.Role>>(roles, DataStatusCode.SUCCESS);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    var roles = await DbContext.Roles.Where(v => !v.IsDeleted).ToListAsync();
+                    response = new DataResponse<List<Models.Role>>(roles, DataStatusCode.SUCCESS);
+                });
             }
             catch (SqlException ex)
             {
@@ -544,22 +589,30 @@ namespace PortfolioAPI.DataServices.DataAccessors
             return response;
         }
 
-        public DataResponse<Models.Role> GetRole(int roleId)
+        /// <summary>
+        /// Gets a role by role id
+        /// </summary>
+        /// <param name="roleId">The role id</param>
+        /// <returns>The role</returns>
+        public async Task<DataResponse<Models.Role>> GetRole(int roleId)
         {
-            DataResponse<Models.Role> response;
+            DataResponse<Models.Role> response = null;
 
             try
             {
-                var role = DbContext.Roles.SingleOrDefault(v => v.RoleId == roleId && !v.IsDeleted);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    var role = await DbContext.Roles.SingleOrDefaultAsync(v => v.RoleId == roleId && !v.IsDeleted);
 
-                if (role == null)
-                {
-                    response = new DataResponse<Models.Role>(DataStatusCode.INVALID, "Invalid role id");
-                }
-                else
-                {
-                    response = new DataResponse<Models.Role>(role, DataStatusCode.SUCCESS);
-                }
+                    if (role == null)
+                    {
+                        response = new DataResponse<Models.Role>(DataStatusCode.INVALID, "Invalid role id");
+                    }
+                    else
+                    {
+                        response = new DataResponse<Models.Role>(role, DataStatusCode.SUCCESS);
+                    }
+                });
             }
             catch (SqlException ex)
             {
@@ -581,26 +634,29 @@ namespace PortfolioAPI.DataServices.DataAccessors
         /// <param name="roleId">The role id of the role to updated</param>
         /// <param name="role">The updated role</param>
         /// <returns>Success determinator</returns>
-        public DataResponse UpdateRole(int roleId, Models.Role role)
+        public async Task<DataResponse> UpdateRole(int roleId, Models.Role role)
         {
-            DataResponse response;
+            DataResponse response = null;
 
             try
             {
-                var dbRole = DbContext.Roles.SingleOrDefault(v => v.RoleId == roleId);
+                await DbCtxLifespanHelper.UseDataContext(DbContextStr, async (DbContext) =>
+                {
+                    var dbRole = await DbContext.Roles.SingleOrDefaultAsync(v => v.RoleId == roleId);
 
-                if (dbRole == null)
-                {
-                    response = new DataResponse(DataStatusCode.INVALID, "Invalid role id");
-                }
-                else
-                {
-                    dbRole.Name = role.Name;
-                    dbRole.Description = role.Description;
-                    dbRole.IsDeleted = role.IsDeleted;
-                    DbContext.SubmitChanges();
-                    response = new DataResponse(DataStatusCode.SUCCESS);
-                }
+                    if (dbRole == null)
+                    {
+                        response = new DataResponse(DataStatusCode.INVALID, "Invalid role id");
+                    }
+                    else
+                    {
+                        dbRole.Name = role.Name;
+                        dbRole.Description = role.Description;
+                        dbRole.IsDeleted = role.IsDeleted;
+                        await DbContext.SaveChangesAsync();
+                        response = new DataResponse(DataStatusCode.SUCCESS);
+                    }
+                });
             }
             catch (SqlException ex)
             {

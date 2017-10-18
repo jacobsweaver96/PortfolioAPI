@@ -41,15 +41,15 @@ namespace PortfolioAPI
             );
 
             // Database connection
-            var pfConnString = ConfigurationManager.ConnectionStrings["PortfolioDBConnectionString"].ConnectionString;
+            var pfConnString = ConfigurationManager.ConnectionStrings["PortfolioDBEntities"].ConnectionString;
             var credentialsFilePath = $"{ConfigurationManager.AppSettings["CredentialsFileName"]}";
-            var credentials = CredentialManager.GetCredentials("PortfolioDBConnectionString", credentialsFilePath);
-            pfConnString = $"{pfConnString};User Id={credentials.UserId};Password={credentials.Password}";
-            var dbCtx = new PortfolioDBDataContext(pfConnString);
-            PortfolioDataAccessService portfolioService = new PortfolioDataAccessService(dbCtx);
+            var credentials = CredentialManager.GetCredentials("PortfolioDBEntities", credentialsFilePath);
+            pfConnString = pfConnString.Replace("{userid}", credentials.UserId)
+                                        .Replace("{password}", credentials.Password);
+            PortfolioDataAccessService portfolioService = new PortfolioDataAccessService(pfConnString);
             DependencyResolver.SetService<IDataAccessService>(portfolioService);
 
-            PortfolioAuthorizationService authorizationService = new PortfolioAuthorizationService(dbCtx);
+            PortfolioAuthorizationService authorizationService = new PortfolioAuthorizationService(pfConnString);
             DependencyResolver.SetService<IAuthorizationService>(authorizationService);
         }
     }
