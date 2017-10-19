@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="PortfolioDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="PortfolioDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="ApiPermissions">
           <Key>
             <PropertyRef Name="ApiPermissionsId" />
@@ -34,6 +34,16 @@
           <Property Name="Username" Type="nvarchar" MaxLength="200" Nullable="false" />
           <Property Name="IsDeleted" Type="bit" Nullable="false" />
         </EntityType>
+        <EntityType Name="RelevantLinks">
+          <Key>
+            <PropertyRef Name="RelevantLinkId" />
+          </Key>
+          <Property Name="RelevantLinkId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LinkUri" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="IsDeleted" Type="bit" Nullable="false" />
+          <Property Name="UrlText" Type="nvarchar(max)" />
+        </EntityType>
         <EntityType Name="Roles">
           <Key>
             <PropertyRef Name="RoleId" />
@@ -61,24 +71,12 @@
           <Property Name="Password" Type="nvarchar(max)" Nullable="false" />
           <Property Name="Salt" Type="nvarchar(max)" Nullable="false" />
           <Property Name="IsDeleted" Type="bit" Nullable="false" />
-        </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'PortfolioDB.sys.database_firewall_rules' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="database_firewall_rules">
-          <Key>
-            <PropertyRef Name="id" />
-            <PropertyRef Name="name" />
-            <PropertyRef Name="start_ip_address" />
-            <PropertyRef Name="end_ip_address" />
-            <PropertyRef Name="create_date" />
-            <PropertyRef Name="modify_date" />
-          </Key>
-          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="start_ip_address" Type="varchar" MaxLength="45" Nullable="false" />
-          <Property Name="end_ip_address" Type="varchar" MaxLength="45" Nullable="false" />
-          <Property Name="create_date" Type="datetime" Nullable="false" />
-          <Property Name="modify_date" Type="datetime" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="50" />
+          <Property Name="MiddleName" Type="nvarchar" MaxLength="50" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="50" />
+          <Property Name="ProfilePictureUri" Type="nvarchar" MaxLength="200" />
+          <Property Name="ResumeLink" Type="nvarchar" MaxLength="200" />
+          <Property Name="Biography" Type="nvarchar(max)" />
         </EntityType>
         <Association Name="FK__Clients__Permiss__6FE99F9F">
           <End Role="ApiPermissions" Type="Self.ApiPermissions" Multiplicity="1" />
@@ -89,6 +87,18 @@ warning 6002: The table/view 'PortfolioDB.sys.database_firewall_rules' does not 
             </Principal>
             <Dependent Role="Clients">
               <PropertyRef Name="PermissionsId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__RelevantL__UserI__02FC7413">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="RelevantLinks" Type="Self.RelevantLinks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="RelevantLinks">
+              <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -132,22 +142,17 @@ warning 6002: The table/view 'PortfolioDB.sys.database_firewall_rules' does not 
           <EntitySet Name="ApiPermissions" EntityType="Self.ApiPermissions" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Clients" EntityType="Self.Clients" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="GithubUsers" EntityType="Self.GithubUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RelevantLinks" EntityType="Self.RelevantLinks" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserRole_Map" EntityType="Self.UserRole_Map" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="database_firewall_rules" EntityType="Self.database_firewall_rules" store:Type="Views" store:Schema="sys">
-            <DefiningQuery>SELECT 
-    [database_firewall_rules].[id] AS [id], 
-    [database_firewall_rules].[name] AS [name], 
-    [database_firewall_rules].[start_ip_address] AS [start_ip_address], 
-    [database_firewall_rules].[end_ip_address] AS [end_ip_address], 
-    [database_firewall_rules].[create_date] AS [create_date], 
-    [database_firewall_rules].[modify_date] AS [modify_date]
-    FROM [sys].[database_firewall_rules] AS [database_firewall_rules]</DefiningQuery>
-          </EntitySet>
           <AssociationSet Name="FK__Clients__Permiss__6FE99F9F" Association="Self.FK__Clients__Permiss__6FE99F9F">
             <End Role="ApiPermissions" EntitySet="ApiPermissions" />
             <End Role="Clients" EntitySet="Clients" />
+          </AssociationSet>
+          <AssociationSet Name="FK__RelevantL__UserI__02FC7413" Association="Self.FK__RelevantL__UserI__02FC7413">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="RelevantLinks" EntitySet="RelevantLinks" />
           </AssociationSet>
           <AssociationSet Name="FK__UserRole___RoleI__60A75C0F" Association="Self.FK__UserRole___RoleI__60A75C0F">
             <End Role="Roles" EntitySet="Roles" />
@@ -162,8 +167,7 @@ warning 6002: The table/view 'PortfolioDB.sys.database_firewall_rules' does not 
             <End Role="GithubUsers" EntitySet="GithubUsers" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="PortfolioDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -231,22 +235,13 @@ warning 6002: The table/view 'PortfolioDB.sys.database_firewall_rules' does not 
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="GithubUsers" Relationship="Self.FK_GithubUser_User" FromRole="Users" ToRole="GithubUsers" />
           <NavigationProperty Name="UserRole_Map" Relationship="Self.FK__UserRole___UserI__619B8048" FromRole="Users" ToRole="UserRole_Map" />
-        </EntityType>
-        <EntityType Name="database_firewall_rules">
-          <Key>
-            <PropertyRef Name="id" />
-            <PropertyRef Name="name" />
-            <PropertyRef Name="start_ip_address" />
-            <PropertyRef Name="end_ip_address" />
-            <PropertyRef Name="create_date" />
-            <PropertyRef Name="modify_date" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="start_ip_address" Type="String" MaxLength="45" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="end_ip_address" Type="String" MaxLength="45" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="create_date" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="modify_date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="MiddleName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ProfilePictureUri" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="ResumeLink" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="Biography" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="RelevantLinks" Relationship="PortfolioDBModel.FK__RelevantL__UserI__02FC7413" FromRole="User" ToRole="RelevantLink" />
         </EntityType>
         <Association Name="FK__Clients__Permiss__6FE99F9F">
           <End Role="ApiPermissions" Type="Self.ApiPermission" Multiplicity="1" />
@@ -303,7 +298,6 @@ warning 6002: The table/view 'PortfolioDB.sys.database_firewall_rules' does not 
           <EntitySet Name="Roles" EntityType="Self.Role" />
           <EntitySet Name="UserRole_Map" EntityType="Self.UserRole_Map" />
           <EntitySet Name="Users" EntityType="Self.User" />
-          <EntitySet Name="database_firewall_rules" EntityType="Self.database_firewall_rules" />
           <AssociationSet Name="FK__Clients__Permiss__6FE99F9F" Association="Self.FK__Clients__Permiss__6FE99F9F">
             <End Role="ApiPermissions" EntitySet="ApiPermissions" />
             <End Role="Clients" EntitySet="Clients" />
@@ -320,7 +314,35 @@ warning 6002: The table/view 'PortfolioDB.sys.database_firewall_rules' does not 
             <End Role="Users" EntitySet="Users" />
             <End Role="UserRole_Map" EntitySet="UserRole_Map" />
           </AssociationSet>
+          <EntitySet Name="RelevantLinks" EntityType="PortfolioDBModel.RelevantLink" />
+          <AssociationSet Name="FK__RelevantL__UserI__02FC7413" Association="PortfolioDBModel.FK__RelevantL__UserI__02FC7413">
+            <End Role="User" EntitySet="Users" />
+            <End Role="RelevantLink" EntitySet="RelevantLinks" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="RelevantLink">
+          <Key>
+            <PropertyRef Name="RelevantLinkId" />
+          </Key>
+          <Property Name="RelevantLinkId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LinkUri" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="User" Relationship="PortfolioDBModel.FK__RelevantL__UserI__02FC7413" FromRole="RelevantLink" ToRole="User" />
+          <Property Name="UrlText" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK__RelevantL__UserI__02FC7413">
+          <End Type="PortfolioDBModel.User" Role="User" Multiplicity="1" />
+          <End Type="PortfolioDBModel.RelevantLink" Role="RelevantLink" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="RelevantLink">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -382,6 +404,12 @@ warning 6002: The table/view 'PortfolioDB.sys.database_firewall_rules' does not 
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="PortfolioDBModel.User">
               <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="Biography" ColumnName="Biography" />
+                <ScalarProperty Name="ResumeLink" ColumnName="ResumeLink" />
+                <ScalarProperty Name="ProfilePictureUri" ColumnName="ProfilePictureUri" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="MiddleName" ColumnName="MiddleName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
@@ -390,15 +418,14 @@ warning 6002: The table/view 'PortfolioDB.sys.database_firewall_rules' does not 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="database_firewall_rules">
-            <EntityTypeMapping TypeName="PortfolioDBModel.database_firewall_rules">
-              <MappingFragment StoreEntitySet="database_firewall_rules">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="start_ip_address" ColumnName="start_ip_address" />
-                <ScalarProperty Name="end_ip_address" ColumnName="end_ip_address" />
-                <ScalarProperty Name="create_date" ColumnName="create_date" />
-                <ScalarProperty Name="modify_date" ColumnName="modify_date" />
+          <EntitySetMapping Name="RelevantLinks">
+            <EntityTypeMapping TypeName="PortfolioDBModel.RelevantLink">
+              <MappingFragment StoreEntitySet="RelevantLinks">
+                <ScalarProperty Name="UrlText" ColumnName="UrlText" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="LinkUri" ColumnName="LinkUri" />
+                <ScalarProperty Name="RelevantLinkId" ColumnName="RelevantLinkId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

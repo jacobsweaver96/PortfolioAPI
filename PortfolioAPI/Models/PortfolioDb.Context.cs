@@ -15,8 +15,8 @@ namespace PortfolioAPI.Models
     
     public partial class PortfolioDBEntities : DbContext
     {
-        public PortfolioDBEntities(string connStr)
-            : base(connStr)
+        public PortfolioDBEntities(string ctxStr)
+            : base(ctxStr)
         {
         }
     
@@ -31,5 +31,6 @@ namespace PortfolioAPI.Models
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<UserRole_Map> UserRole_Map { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<RelevantLink> RelevantLinks { get; set; }
     }
 }

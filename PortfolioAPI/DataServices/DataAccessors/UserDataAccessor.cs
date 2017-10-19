@@ -339,9 +339,17 @@ namespace PortfolioAPI.DataServices.DataAccessors
                     }
                     else
                     {
-                        dbUser.Password = user.Password;
-                        dbUser.Salt = user.Salt;
+                        dbUser.FirstName = user.FirstName ?? dbUser.FirstName;
+                        dbUser.MiddleName = user.MiddleName ?? dbUser.MiddleName;
+                        dbUser.LastName = user.LastName ?? dbUser.LastName;
+                        dbUser.Biography = user.Biography ?? dbUser.Biography;
+                        dbUser.ProfilePictureUri = user.ProfilePictureUri ?? dbUser.ProfilePictureUri;
+                        dbUser.RelevantLinks = user.RelevantLinks ?? dbUser.RelevantLinks;
+                        dbUser.ResumeLink = user.ResumeLink ?? dbUser.ResumeLink;
+                        dbUser.Password = user.Password ?? dbUser.Password;
+                        dbUser.Salt = user.Salt ?? dbUser.Salt;
                         dbUser.IsDeleted = user.IsDeleted;
+
                         await DbContext.SaveChangesAsync();
                         response = new DataResponse(DataStatusCode.SUCCESS);
                     }

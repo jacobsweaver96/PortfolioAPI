@@ -45,6 +45,16 @@ namespace PortfolioAPI.Util
                 sUser = new SerializableClass.User
                 {
                     UserId = user.UserId,
+                    FirstName = user.FirstName,
+                    MiddleName = user.MiddleName,
+                    LastName = user.LastName,
+                    Biography = user.Biography,
+                    ResumeLink = user.ResumeLink,
+                    ProfilePictureUri = user.ProfilePictureUri,
+                    GithubUsers = user.GithubUsers
+                                    .Where(v => !v.IsDeleted)
+                                    .Select(v => ToSerializableGithubUser(v))
+                                    .ToList(),
                     Email = user.Email,
                     Password = user.Password,
                     Salt = user.Salt,
@@ -53,6 +63,10 @@ namespace PortfolioAPI.Util
                             .Select(v => ToSeriazlizableRole(v.Role))
                             .Where(v => !v.IsDeleted)
                             .ToList(),
+                    RelevantLinks = user.RelevantLinks
+                                        .Where(v => !v.IsDeleted)
+                                        .Select(v => ToSerializableRelevantLink(v))
+                                        .ToList(),
                     IsDeleted = user.IsDeleted
                 };
             }
@@ -84,6 +98,16 @@ namespace PortfolioAPI.Util
             {
                 dUser = new User
                 {
+                    FirstName = user.FirstName,
+                    MiddleName = user.MiddleName,
+                    LastName = user.LastName,
+                    Biography = user.Biography,
+                    ProfilePictureUri = user.ProfilePictureUri,
+                    ResumeLink = user.ResumeLink,
+                    RelevantLinks = user.RelevantLinks
+                                        .Where(v => !v.IsDeleted)
+                                        .Select(v => ToDbRelevantLink(v))
+                                        .ToList(),
                     UserId = user.UserId,
                     Email = user.Email,
                     Password = user.Password,
@@ -233,6 +257,66 @@ namespace PortfolioAPI.Util
             }
 
             return dRole;
+        }
+
+        public static SerializableClass.RelevantLink ToSerializableRelevantLink(RelevantLink link)
+        {
+            SerializableClass.RelevantLink sLink = null;
+
+            if (link == null)
+            {
+                StackTrace stackTrace = new StackTrace();
+                logger.Warn($"Passed a null value to {currNamespace}.ToSerializableRelevantLink from {stackTrace.GetFrame(1).GetMethod().Name}");
+                return sLink;
+            }
+
+            try
+            {
+                sLink = new SerializableClass.RelevantLink
+                {
+                    RelevantLinkId = link.RelevantLinkId,
+                    LinkUri = link.LinkUri,
+                    UrlText = link.UrlText,
+                    IsDeleted = link.IsDeleted,
+                    UserId = link.UserId
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Exception on converting database relevant link model to a serializable relevant link model", ex);
+            }
+
+            return sLink;
+        }
+
+        public static RelevantLink ToDbRelevantLink(SerializableClass.RelevantLink link)
+        {
+            RelevantLink dLink = null;
+
+            if (link == null)
+            {
+                StackTrace stackTrace = new StackTrace();
+                logger.Warn($"Passed a null value to {currNamespace}.ToDbRelevantLink from {stackTrace.GetFrame(1).GetMethod().Name}");
+                return dLink;
+            }
+
+            try
+            {
+                dLink = new RelevantLink
+                {
+                    RelevantLinkId = link.RelevantLinkId,
+                    LinkUri = link.LinkUri,
+                    UrlText = link.UrlText,
+                    IsDeleted = link.IsDeleted,
+                    UserId = link.UserId
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Exception on converting serializable relevant link model to a database relevant link model", ex);
+            }
+
+            return dLink;
         }
     }
 }

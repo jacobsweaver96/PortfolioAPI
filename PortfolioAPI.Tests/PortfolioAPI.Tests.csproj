@@ -49,10 +49,10 @@
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="RestEasy, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestEasy.1.0.1\lib\RestEasy.dll</HintPath>
+      <HintPath>..\packages\RestEasy.1.0.2\lib\RestEasy.dll</HintPath>
     </Reference>
     <Reference Include="SandyModels, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SandyModels.1.0.3\lib\SandyModels.dll</HintPath>
+      <HintPath>..\packages\SandyModels.1.0.4\lib\SandyModels.dll</HintPath>
     </Reference>
     <Reference Include="SandyUtils, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SandyUtils.1.0.3\lib\SandyUtils.dll</HintPath>

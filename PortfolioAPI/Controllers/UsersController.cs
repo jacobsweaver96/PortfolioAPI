@@ -154,5 +154,26 @@ namespace PortfolioAPI.Controllers
 
             return await response;
         }
+
+        [HttpPost]
+        [Route("{UserName}/Password")]
+        [RestInfo("POST", "Change the password of the user with {UserName}")]
+        [RequiresWriteAccess]
+        public async Task<ApiResponse> UpdatePassword(string userName, [FromBody]User user)
+        {
+            var response = CreateRestResponse(MethodBase.GetCurrentMethod().GetCustomAttributesData(),
+            async () =>
+            {
+                var dataResponse = await DataAccessService.UserDataAccessor.GetUser(userName);
+                var dbUser = dataResponse.Value;
+
+                dbUser.Password = user.Password;
+                dbUser.Salt = user.Salt;
+
+                return await DataAccessService.UserDataAccessor.UpdateUser(dbUser.UserId, dbUser);
+            });
+
+            return await response;
+        }
     }
 }

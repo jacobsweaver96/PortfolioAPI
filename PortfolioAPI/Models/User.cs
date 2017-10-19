@@ -19,6 +19,7 @@ namespace PortfolioAPI.Models
         {
             this.GithubUsers = new HashSet<GithubUser>();
             this.UserRole_Map = new HashSet<UserRole_Map>();
+            this.RelevantLinks = new HashSet<RelevantLink>();
         }
     
         public int UserId { get; set; }
@@ -26,10 +27,18 @@ namespace PortfolioAPI.Models
         public string Password { get; set; }
         public string Salt { get; set; }
         public bool IsDeleted { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public string ProfilePictureUri { get; set; }
+        public string ResumeLink { get; set; }
+        public string Biography { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<GithubUser> GithubUsers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserRole_Map> UserRole_Map { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<RelevantLink> RelevantLinks { get; set; }
     }
 }

@@ -11,11 +11,12 @@
         <EntityTypeShape EntityType="PortfolioDBModel.Role" Width="1.5" PointX="0.75" PointY="7.625" IsExpanded="true" />
         <EntityTypeShape EntityType="PortfolioDBModel.UserRole_Map" Width="1.5" PointX="3" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="PortfolioDBModel.User" Width="1.5" PointX="0.75" PointY="3.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="PortfolioDBModel.database_firewall_rules" Width="1.5" PointX="2.75" PointY="7.125" IsExpanded="true" />
         <AssociationConnector Association="PortfolioDBModel.FK__Clients__Permiss__6FE99F9F" ManuallyRouted="false" />
         <AssociationConnector Association="PortfolioDBModel.FK_GithubUser_User" ManuallyRouted="false" />
         <AssociationConnector Association="PortfolioDBModel.FK__UserRole___RoleI__60A75C0F" ManuallyRouted="false" />
         <AssociationConnector Association="PortfolioDBModel.FK__UserRole___UserI__619B8048" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="PortfolioDBModel.RelevantLink" Width="1.5" PointX="3" PointY="10.5" />
+        <AssociationConnector Association="PortfolioDBModel.FK__RelevantL__UserI__02FC7413" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
